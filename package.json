@@ -1,0 +1,23 @@
+{
+  "name": "header-toy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "webpack": "^4.10.2",
+    "webpack-cli": "^3.0.1"
+  },
+  "scripts": {
+    "build": "webpack --mode=production",
+    "dev": "webpack --watch --mode=development"
+  },
+  "dependencies": {
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0"
+  }
+}
