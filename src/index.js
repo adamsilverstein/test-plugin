@@ -1,9 +1,14 @@
-function component() {
-	var element = document.createElement('div');
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-	element.innerHTML = _.join(['Hello---', 'webpack'], ' ');
+import TestPlugin from './test-plugin';
 
-	return element;
-  }
-
-  document.body.appendChild(component());
+// Create a container for the app.
+const container = new jQuery( '<div />' ).attr( 'id', 'approot' );
+jQuery( 'body' ).prepend( container );
+jQuery( document ).ready( function() {
+	ReactDOM.render(
+	<TestPlugin />,
+	document.getElementById('approot')
+	);
+} );

@@ -17,6 +17,7 @@
     "dev": "webpack --watch --mode=development"
   },
   "dependencies": {
+    "babel-preset-react": "^6.24.1",
     "react": "^16.4.0",
     "react-dom": "^16.4.0"
   }
