@@ -86,6 +86,545 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/@wordpress/hooks/build-module/createAddHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createAddHook.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateNamespace.js */ \"./node_modules/@wordpress/hooks/build-module/validateNamespace.js\");\n/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./validateHookName.js */ \"./node_modules/@wordpress/hooks/build-module/validateHookName.js\");\n/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ */ \"./node_modules/@wordpress/hooks/build-module/index.js\");\n\n\n\n\n/**\n * Returns a function which, when invoked, will add a hook.\n *\n * @param  {Object}   hooks Stored hooks, keyed by hook name.\n *\n * @return {Function}       Function that adds a new hook.\n */\nfunction createAddHook(hooks) {\n\t/**\n  * Adds the hook to the appropriate hooks container.\n  *\n  * @param {string}   hookName  Name of hook to add\n  * @param {string}   namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.\n  * @param {Function} callback  Function to call when the hook is run\n  * @param {?number}  priority  Priority of this hook (default=10)\n  */\n\treturn function addHook(hookName, namespace, callback) {\n\t\tvar priority = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10;\n\n\n\t\tif (!Object(_validateHookName_js__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(hookName)) {\n\t\t\treturn;\n\t\t}\n\n\t\tif (!Object(_validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(namespace)) {\n\t\t\treturn;\n\t\t}\n\n\t\tif ('function' !== typeof callback) {\n\t\t\tconsole.error('The hook callback must be a function.');\n\t\t\treturn;\n\t\t}\n\n\t\t// Validate numeric priority\n\t\tif ('number' !== typeof priority) {\n\t\t\tconsole.error('If specified, the hook priority must be a number.');\n\t\t\treturn;\n\t\t}\n\n\t\tvar handler = { callback: callback, priority: priority, namespace: namespace };\n\n\t\tif (hooks[hookName]) {\n\t\t\t// Find the correct insert index of the new hook.\n\t\t\tvar handlers = hooks[hookName].handlers;\n\t\t\tvar i = 0;\n\t\t\twhile (i < handlers.length) {\n\t\t\t\tif (handlers[i].priority > priority) {\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t\t\ti++;\n\t\t\t}\n\t\t\t// Insert (or append) the new hook.\n\t\t\thandlers.splice(i, 0, handler);\n\t\t\t// We may also be currently executing this hook.  If the callback\n\t\t\t// we're adding would come after the current callback, there's no\n\t\t\t// problem; otherwise we need to increase the execution index of\n\t\t\t// any other runs by 1 to account for the added element.\n\t\t\t(hooks.__current || []).forEach(function (hookInfo) {\n\t\t\t\tif (hookInfo.name === hookName && hookInfo.currentIndex >= i) {\n\t\t\t\t\thookInfo.currentIndex++;\n\t\t\t\t}\n\t\t\t});\n\t\t} else {\n\t\t\t// This is the first hook of its type.\n\t\t\thooks[hookName] = {\n\t\t\t\thandlers: [handler],\n\t\t\t\truns: 0\n\t\t\t};\n\t\t}\n\n\t\tif (hookName !== 'hookAdded') {\n\t\t\tObject(___WEBPACK_IMPORTED_MODULE_2__[\"doAction\"])('hookAdded', hookName, namespace, callback, priority);\n\t\t}\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createAddHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createAddHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createCurrentHook.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createCurrentHook.js ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/**\n * Returns a function which, when invoked, will return the name of the\n * currently running hook, or `null` if no hook of the given type is currently\n * running.\n *\n * @param  {Object}   hooks          Stored hooks, keyed by hook name.\n *\n * @return {Function}                Function that returns the current hook.\n */\nfunction createCurrentHook(hooks, returnFirstArg) {\n\t/**\n  * Returns the name of the currently running hook, or `null` if no hook of\n  * the given type is currently running.\n  *\n  * @return {?string}             The name of the currently running hook, or\n  *                               `null` if no hook is currently running.\n  */\n\treturn function currentHook() {\n\t\tif (!hooks.__current || !hooks.__current.length) {\n\t\t\treturn null;\n\t\t}\n\n\t\treturn hooks.__current[hooks.__current.length - 1].name;\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createCurrentHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createCurrentHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createDidHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createDidHook.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateHookName.js */ \"./node_modules/@wordpress/hooks/build-module/validateHookName.js\");\n\n\n/**\n * Returns a function which, when invoked, will return the number of times a\n * hook has been called.\n *\n * @param  {Object}   hooks Stored hooks, keyed by hook name.\n *\n * @return {Function}       Function that returns a hook's call count.\n */\nfunction createDidHook(hooks) {\n\t/**\n  * Returns the number of times an action has been fired.\n  *\n  * @param  {string} hookName The hook name to check.\n  *\n  * @return {number}          The number of times the hook has run.\n  */\n\treturn function didHook(hookName) {\n\n\t\tif (!Object(_validateHookName_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(hookName)) {\n\t\t\treturn;\n\t\t}\n\n\t\treturn hooks[hookName] && hooks[hookName].runs ? hooks[hookName].runs : 0;\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createDidHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createDidHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createDoingHook.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createDoingHook.js ***!
+  \***********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/**\n * Returns a function which, when invoked, will return whether a hook is\n * currently being executed.\n *\n * @param  {Object}   hooks Stored hooks, keyed by hook name.\n *\n * @return {Function}       Function that returns whether a hook is currently\n *                          being executed.\n */\nfunction createDoingHook(hooks) {\n\t/**\n  * Returns whether a hook is currently being executed.\n  *\n  * @param  {?string} hookName The name of the hook to check for.  If\n  *                            omitted, will check for any hook being executed.\n  *\n  * @return {bool}             Whether the hook is being executed.\n  */\n\treturn function doingHook(hookName) {\n\t\t// If the hookName was not passed, check for any current hook.\n\t\tif ('undefined' === typeof hookName) {\n\t\t\treturn 'undefined' !== typeof hooks.__current[0];\n\t\t}\n\n\t\t// Return the __current hook.\n\t\treturn hooks.__current[0] ? hookName === hooks.__current[0].name : false;\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createDoingHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createDoingHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createHasHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createHasHook.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/**\n * Returns a function which, when invoked, will return whether any handlers are\n * attached to a particular hook.\n *\n * @param  {Object}   hooks Stored hooks, keyed by hook name.\n *\n * @return {Function}       Function that returns whether any handlers are\n *                          attached to a particular hook.\n */\nfunction createHasHook(hooks) {\n\t/**\n  * Returns how many handlers are attached for the given hook.\n  *\n  * @param  {string}  hookName The name of the hook to check for.\n  *\n  * @return {boolean} Whether there are handlers that are attached to the given hook.\n  */\n\treturn function hasHook(hookName) {\n\t\treturn hookName in hooks;\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createHasHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createHasHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createHooks.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createHooks.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var babel_runtime_core_js_object_create__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! babel-runtime/core-js/object/create */ \"./node_modules/babel-runtime/core-js/object/create.js\");\n/* harmony import */ var babel_runtime_core_js_object_create__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_core_js_object_create__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _createAddHook__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./createAddHook */ \"./node_modules/@wordpress/hooks/build-module/createAddHook.js\");\n/* harmony import */ var _createRemoveHook__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./createRemoveHook */ \"./node_modules/@wordpress/hooks/build-module/createRemoveHook.js\");\n/* harmony import */ var _createHasHook__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./createHasHook */ \"./node_modules/@wordpress/hooks/build-module/createHasHook.js\");\n/* harmony import */ var _createRunHook__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./createRunHook */ \"./node_modules/@wordpress/hooks/build-module/createRunHook.js\");\n/* harmony import */ var _createCurrentHook__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./createCurrentHook */ \"./node_modules/@wordpress/hooks/build-module/createCurrentHook.js\");\n/* harmony import */ var _createDoingHook__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./createDoingHook */ \"./node_modules/@wordpress/hooks/build-module/createDoingHook.js\");\n/* harmony import */ var _createDidHook__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./createDidHook */ \"./node_modules/@wordpress/hooks/build-module/createDidHook.js\");\n\n\n\n\n\n\n\n\n\n/**\n * Returns an instance of the hooks object.\n *\n * @return {Object} Object that contains all hooks.\n */\nfunction createHooks() {\n\tvar actions = babel_runtime_core_js_object_create__WEBPACK_IMPORTED_MODULE_0___default()(null);\n\tvar filters = babel_runtime_core_js_object_create__WEBPACK_IMPORTED_MODULE_0___default()(null);\n\tactions.__current = [];\n\tfilters.__current = [];\n\n\treturn {\n\t\taddAction: Object(_createAddHook__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(actions),\n\t\taddFilter: Object(_createAddHook__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(filters),\n\t\tremoveAction: Object(_createRemoveHook__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(actions),\n\t\tremoveFilter: Object(_createRemoveHook__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(filters),\n\t\thasAction: Object(_createHasHook__WEBPACK_IMPORTED_MODULE_3__[\"default\"])(actions),\n\t\thasFilter: Object(_createHasHook__WEBPACK_IMPORTED_MODULE_3__[\"default\"])(filters),\n\t\tremoveAllActions: Object(_createRemoveHook__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(actions, true),\n\t\tremoveAllFilters: Object(_createRemoveHook__WEBPACK_IMPORTED_MODULE_2__[\"default\"])(filters, true),\n\t\tdoAction: Object(_createRunHook__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(actions),\n\t\tapplyFilters: Object(_createRunHook__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(filters, true),\n\t\tcurrentAction: Object(_createCurrentHook__WEBPACK_IMPORTED_MODULE_5__[\"default\"])(actions),\n\t\tcurrentFilter: Object(_createCurrentHook__WEBPACK_IMPORTED_MODULE_5__[\"default\"])(filters),\n\t\tdoingAction: Object(_createDoingHook__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(actions),\n\t\tdoingFilter: Object(_createDoingHook__WEBPACK_IMPORTED_MODULE_6__[\"default\"])(filters),\n\t\tdidAction: Object(_createDidHook__WEBPACK_IMPORTED_MODULE_7__[\"default\"])(actions),\n\t\tdidFilter: Object(_createDidHook__WEBPACK_IMPORTED_MODULE_7__[\"default\"])(filters),\n\t\tactions: actions,\n\t\tfilters: filters\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createHooks);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createHooks.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createRemoveHook.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createRemoveHook.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateNamespace.js */ \"./node_modules/@wordpress/hooks/build-module/validateNamespace.js\");\n/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./validateHookName.js */ \"./node_modules/@wordpress/hooks/build-module/validateHookName.js\");\n/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ */ \"./node_modules/@wordpress/hooks/build-module/index.js\");\n\n\n\n\n/**\n * Returns a function which, when invoked, will remove a specified hook or all\n * hooks by the given name.\n *\n * @param  {Object}   hooks      Stored hooks, keyed by hook name.\n * @param  {bool}     removeAll  Whether to remove all callbacks for a hookName, without regard to namespace. Used to create `removeAll*` functions.\n *\n * @return {Function}            Function that removes hooks.\n */\nfunction createRemoveHook(hooks, removeAll) {\n\t/**\n  * Removes the specified callback (or all callbacks) from the hook with a\n  * given hookName and namespace.\n  *\n  * @param {string}    hookName  The name of the hook to modify.\n  * @param {string}    namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.\n  *\n  * @return {number}             The number of callbacks removed.\n  */\n\treturn function removeHook(hookName, namespace) {\n\n\t\tif (!Object(_validateHookName_js__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(hookName)) {\n\t\t\treturn;\n\t\t}\n\n\t\tif (!removeAll && !Object(_validateNamespace_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(namespace)) {\n\t\t\treturn;\n\t\t}\n\n\t\t// Bail if no hooks exist by this name\n\t\tif (!hooks[hookName]) {\n\t\t\treturn 0;\n\t\t}\n\n\t\tvar handlersRemoved = 0;\n\n\t\tif (removeAll) {\n\t\t\thandlersRemoved = hooks[hookName].handlers.length;\n\t\t\thooks[hookName] = {\n\t\t\t\truns: hooks[hookName].runs,\n\t\t\t\thandlers: []\n\t\t\t};\n\t\t} else {\n\t\t\t// Try to find the specified callback to remove.\n\t\t\tvar handlers = hooks[hookName].handlers;\n\n\t\t\tvar _loop = function _loop(i) {\n\t\t\t\tif (handlers[i].namespace === namespace) {\n\t\t\t\t\thandlers.splice(i, 1);\n\t\t\t\t\thandlersRemoved++;\n\t\t\t\t\t// This callback may also be part of a hook that is\n\t\t\t\t\t// currently executing.  If the callback we're removing\n\t\t\t\t\t// comes after the current callback, there's no problem;\n\t\t\t\t\t// otherwise we need to decrease the execution index of any\n\t\t\t\t\t// other runs by 1 to account for the removed element.\n\t\t\t\t\t(hooks.__current || []).forEach(function (hookInfo) {\n\t\t\t\t\t\tif (hookInfo.name === hookName && hookInfo.currentIndex >= i) {\n\t\t\t\t\t\t\thookInfo.currentIndex--;\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t};\n\n\t\t\tfor (var i = handlers.length - 1; i >= 0; i--) {\n\t\t\t\t_loop(i);\n\t\t\t}\n\t\t}\n\t\tif (hookName !== 'hookRemoved') {\n\t\t\tObject(___WEBPACK_IMPORTED_MODULE_2__[\"doAction\"])('hookRemoved', hookName, namespace);\n\t\t}\n\n\t\treturn handlersRemoved;\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createRemoveHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createRemoveHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/createRunHook.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/createRunHook.js ***!
+  \*********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _validateHookName_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validateHookName.js */ \"./node_modules/@wordpress/hooks/build-module/validateHookName.js\");\n\n\n/**\n * Returns a function which, when invoked, will execute all callbacks\n * registered to a hook of the specified type, optionally returning the final\n * value of the call chain.\n *\n * @param  {Object}   hooks          Stored hooks, keyed by hook name.\n * @param  {?bool}    returnFirstArg Whether each hook callback is expected to\n *                                   return its first argument.\n *\n * @return {Function}                Function that runs hook callbacks.\n */\nfunction createRunHook(hooks, returnFirstArg) {\n\t/**\n  * Runs all callbacks for the specified hook.\n  *\n  * @param  {string} hookName The name of the hook to run.\n  * @param  {...*}   args     Arguments to pass to the hook callbacks.\n  *\n  * @return {*}               Return value of runner, if applicable.\n  */\n\treturn function runHooks(hookName) {\n\t\tvar handlers = void 0;\n\t\tif (!hooks[hookName]) {\n\t\t\thooks[hookName] = {\n\t\t\t\thandlers: [],\n\t\t\t\truns: 0\n\t\t\t};\n\t\t}\n\n\t\thooks[hookName].runs++;\n\n\t\thandlers = hooks[hookName].handlers;\n\n\t\tfor (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {\n\t\t\targs[_key - 1] = arguments[_key];\n\t\t}\n\n\t\tif (!handlers || !handlers.length) {\n\t\t\treturn returnFirstArg ? args[0] : undefined;\n\t\t}\n\n\t\tvar hookInfo = {\n\t\t\tname: hookName,\n\t\t\tcurrentIndex: 0\n\t\t};\n\n\t\thooks.__current.push(hookInfo);\n\n\t\tif (!hooks[hookName]) {\n\t\t\thooks[hookName] = {\n\t\t\t\truns: 0,\n\t\t\t\thandlers: []\n\t\t\t};\n\t\t}\n\n\t\twhile (hookInfo.currentIndex < handlers.length) {\n\t\t\tvar handler = handlers[hookInfo.currentIndex];\n\n\t\t\tvar result = handler.callback.apply(null, args);\n\t\t\tif (returnFirstArg) {\n\t\t\t\targs[0] = result;\n\t\t\t}\n\n\t\t\thookInfo.currentIndex++;\n\t\t}\n\n\t\thooks.__current.pop();\n\n\t\tif (returnFirstArg) {\n\t\t\treturn args[0];\n\t\t}\n\t};\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (createRunHook);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/createRunHook.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/index.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/index.js ***!
+  \*************************************************************/
+/*! exports provided: createHooks, addAction, addFilter, removeAction, removeFilter, hasAction, hasFilter, removeAllActions, removeAllFilters, doAction, applyFilters, currentAction, currentFilter, doingAction, doingFilter, didAction, didFilter, actions, filters */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"addAction\", function() { return addAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"addFilter\", function() { return addFilter; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"removeAction\", function() { return removeAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"removeFilter\", function() { return removeFilter; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"hasAction\", function() { return hasAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"hasFilter\", function() { return hasFilter; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"removeAllActions\", function() { return removeAllActions; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"removeAllFilters\", function() { return removeAllFilters; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"doAction\", function() { return doAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"applyFilters\", function() { return applyFilters; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"currentAction\", function() { return currentAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"currentFilter\", function() { return currentFilter; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"doingAction\", function() { return doingAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"doingFilter\", function() { return doingFilter; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"didAction\", function() { return didAction; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"didFilter\", function() { return didFilter; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"actions\", function() { return actions; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"filters\", function() { return filters; });\n/* harmony import */ var _createHooks__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createHooks */ \"./node_modules/@wordpress/hooks/build-module/createHooks.js\");\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"createHooks\", function() { return _createHooks__WEBPACK_IMPORTED_MODULE_0__[\"default\"]; });\n\n\n\nvar _createHooks = Object(_createHooks__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(),\n    addAction = _createHooks.addAction,\n    addFilter = _createHooks.addFilter,\n    removeAction = _createHooks.removeAction,\n    removeFilter = _createHooks.removeFilter,\n    hasAction = _createHooks.hasAction,\n    hasFilter = _createHooks.hasFilter,\n    removeAllActions = _createHooks.removeAllActions,\n    removeAllFilters = _createHooks.removeAllFilters,\n    doAction = _createHooks.doAction,\n    applyFilters = _createHooks.applyFilters,\n    currentAction = _createHooks.currentAction,\n    currentFilter = _createHooks.currentFilter,\n    doingAction = _createHooks.doingAction,\n    doingFilter = _createHooks.doingFilter,\n    didAction = _createHooks.didAction,\n    didFilter = _createHooks.didFilter,\n    actions = _createHooks.actions,\n    filters = _createHooks.filters;\n\n\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/index.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/validateHookName.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/validateHookName.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/**\n * Validate a hookName string.\n *\n * @param  {string} hookName The hook name to validate. Should be a non empty string containing\n *                           only numbers, letters, dashes, periods and underscores. Also,\n *                           the hook name cannot begin with `__`.\n *\n * @return {bool}            Whether the hook name is valid.\n */\nfunction validateHookName(hookName) {\n\n\tif ('string' !== typeof hookName || '' === hookName) {\n\t\tconsole.error('The hook name must be a non-empty string.');\n\t\treturn false;\n\t}\n\n\tif (/^__/.test(hookName)) {\n\t\tconsole.error('The hook name cannot begin with `__`.');\n\t\treturn false;\n\t}\n\n\tif (!/^[a-zA-Z][a-zA-Z0-9_.-]*$/.test(hookName)) {\n\t\tconsole.error('The hook name can only contain numbers, letters, dashes, periods and underscores.');\n\t\treturn false;\n\t}\n\n\treturn true;\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (validateHookName);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/validateHookName.js?");
+
+/***/ }),
+
+/***/ "./node_modules/@wordpress/hooks/build-module/validateNamespace.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/@wordpress/hooks/build-module/validateNamespace.js ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/**\n * Validate a namespace string.\n *\n * @param  {string} namespace The namespace to validate - should take the form\n *                            `vendor/plugin/function`.\n *\n * @return {bool}             Whether the namespace is valid.\n */\nfunction validateNamespace(namespace) {\n\n\tif ('string' !== typeof namespace || '' === namespace) {\n\t\tconsole.error('The namespace must be a non-empty string.');\n\t\treturn false;\n\t}\n\n\tif (!/^[a-zA-Z][a-zA-Z0-9_.\\-\\/]*$/.test(namespace)) {\n\t\tconsole.error('The namespace can only contain numbers, letters, dashes, periods, underscores and slashes.');\n\t\treturn false;\n\t}\n\n\treturn true;\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (validateNamespace);\n\n//# sourceURL=webpack:///./node_modules/@wordpress/hooks/build-module/validateNamespace.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/core-js/object/create.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/babel-runtime/core-js/object/create.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("module.exports = { \"default\": __webpack_require__(/*! core-js/library/fn/object/create */ \"./node_modules/babel-runtime/node_modules/core-js/library/fn/object/create.js\"), __esModule: true };\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/core-js/object/create.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/fn/object/create.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/fn/object/create.js ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("__webpack_require__(/*! ../../modules/es6.object.create */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/es6.object.create.js\");\nvar $Object = __webpack_require__(/*! ../../modules/_core */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_core.js\").Object;\nmodule.exports = function create(P, D) {\n  return $Object.create(P, D);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/fn/object/create.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_a-function.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_a-function.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = function (it) {\n  if (typeof it != 'function') throw TypeError(it + ' is not a function!');\n  return it;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_a-function.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_an-object.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_an-object.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var isObject = __webpack_require__(/*! ./_is-object */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_is-object.js\");\nmodule.exports = function (it) {\n  if (!isObject(it)) throw TypeError(it + ' is not an object!');\n  return it;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_an-object.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_array-includes.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_array-includes.js ***!
+  \********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// false -> Array#indexOf\n// true  -> Array#includes\nvar toIObject = __webpack_require__(/*! ./_to-iobject */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-iobject.js\");\nvar toLength = __webpack_require__(/*! ./_to-length */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-length.js\");\nvar toAbsoluteIndex = __webpack_require__(/*! ./_to-absolute-index */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-absolute-index.js\");\nmodule.exports = function (IS_INCLUDES) {\n  return function ($this, el, fromIndex) {\n    var O = toIObject($this);\n    var length = toLength(O.length);\n    var index = toAbsoluteIndex(fromIndex, length);\n    var value;\n    // Array#includes uses SameValueZero equality algorithm\n    // eslint-disable-next-line no-self-compare\n    if (IS_INCLUDES && el != el) while (length > index) {\n      value = O[index++];\n      // eslint-disable-next-line no-self-compare\n      if (value != value) return true;\n    // Array#indexOf ignores holes, Array#includes - not\n    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {\n      if (O[index] === el) return IS_INCLUDES || index || 0;\n    } return !IS_INCLUDES && -1;\n  };\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_array-includes.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_cof.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_cof.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("var toString = {}.toString;\n\nmodule.exports = function (it) {\n  return toString.call(it).slice(8, -1);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_cof.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_core.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_core.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("var core = module.exports = { version: '2.5.7' };\nif (typeof __e == 'number') __e = core; // eslint-disable-line no-undef\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_core.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_ctx.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_ctx.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// optional / simple context binding\nvar aFunction = __webpack_require__(/*! ./_a-function */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_a-function.js\");\nmodule.exports = function (fn, that, length) {\n  aFunction(fn);\n  if (that === undefined) return fn;\n  switch (length) {\n    case 1: return function (a) {\n      return fn.call(that, a);\n    };\n    case 2: return function (a, b) {\n      return fn.call(that, a, b);\n    };\n    case 3: return function (a, b, c) {\n      return fn.call(that, a, b, c);\n    };\n  }\n  return function (/* ...args */) {\n    return fn.apply(that, arguments);\n  };\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_ctx.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_defined.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_defined.js ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("// 7.2.1 RequireObjectCoercible(argument)\nmodule.exports = function (it) {\n  if (it == undefined) throw TypeError(\"Can't call method on  \" + it);\n  return it;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_defined.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// Thank's IE8 for his funny defineProperty\nmodule.exports = !__webpack_require__(/*! ./_fails */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_fails.js\")(function () {\n  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;\n});\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_dom-create.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_dom-create.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var isObject = __webpack_require__(/*! ./_is-object */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_is-object.js\");\nvar document = __webpack_require__(/*! ./_global */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js\").document;\n// typeof document.createElement is 'object' in old IE\nvar is = isObject(document) && isObject(document.createElement);\nmodule.exports = function (it) {\n  return is ? document.createElement(it) : {};\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_dom-create.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_enum-bug-keys.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_enum-bug-keys.js ***!
+  \*******************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("// IE 8- don't enum bug keys\nmodule.exports = (\n  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'\n).split(',');\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_enum-bug-keys.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_export.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_export.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var global = __webpack_require__(/*! ./_global */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js\");\nvar core = __webpack_require__(/*! ./_core */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_core.js\");\nvar ctx = __webpack_require__(/*! ./_ctx */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_ctx.js\");\nvar hide = __webpack_require__(/*! ./_hide */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_hide.js\");\nvar has = __webpack_require__(/*! ./_has */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_has.js\");\nvar PROTOTYPE = 'prototype';\n\nvar $export = function (type, name, source) {\n  var IS_FORCED = type & $export.F;\n  var IS_GLOBAL = type & $export.G;\n  var IS_STATIC = type & $export.S;\n  var IS_PROTO = type & $export.P;\n  var IS_BIND = type & $export.B;\n  var IS_WRAP = type & $export.W;\n  var exports = IS_GLOBAL ? core : core[name] || (core[name] = {});\n  var expProto = exports[PROTOTYPE];\n  var target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE];\n  var key, own, out;\n  if (IS_GLOBAL) source = name;\n  for (key in source) {\n    // contains in native\n    own = !IS_FORCED && target && target[key] !== undefined;\n    if (own && has(exports, key)) continue;\n    // export native or passed\n    out = own ? target[key] : source[key];\n    // prevent global pollution for namespaces\n    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]\n    // bind timers to global for call from export context\n    : IS_BIND && own ? ctx(out, global)\n    // wrap global constructors for prevent change them in library\n    : IS_WRAP && target[key] == out ? (function (C) {\n      var F = function (a, b, c) {\n        if (this instanceof C) {\n          switch (arguments.length) {\n            case 0: return new C();\n            case 1: return new C(a);\n            case 2: return new C(a, b);\n          } return new C(a, b, c);\n        } return C.apply(this, arguments);\n      };\n      F[PROTOTYPE] = C[PROTOTYPE];\n      return F;\n    // make static versions for prototype methods\n    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;\n    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%\n    if (IS_PROTO) {\n      (exports.virtual || (exports.virtual = {}))[key] = out;\n      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%\n      if (type & $export.R && expProto && !expProto[key]) hide(expProto, key, out);\n    }\n  }\n};\n// type bitmap\n$export.F = 1;   // forced\n$export.G = 2;   // global\n$export.S = 4;   // static\n$export.P = 8;   // proto\n$export.B = 16;  // bind\n$export.W = 32;  // wrap\n$export.U = 64;  // safe\n$export.R = 128; // real proto method for `library`\nmodule.exports = $export;\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_export.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_fails.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_fails.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = function (exec) {\n  try {\n    return !!exec();\n  } catch (e) {\n    return true;\n  }\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_fails.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028\nvar global = module.exports = typeof window != 'undefined' && window.Math == Math\n  ? window : typeof self != 'undefined' && self.Math == Math ? self\n  // eslint-disable-next-line no-new-func\n  : Function('return this')();\nif (typeof __g == 'number') __g = global; // eslint-disable-line no-undef\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_has.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_has.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("var hasOwnProperty = {}.hasOwnProperty;\nmodule.exports = function (it, key) {\n  return hasOwnProperty.call(it, key);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_has.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_hide.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_hide.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var dP = __webpack_require__(/*! ./_object-dp */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dp.js\");\nvar createDesc = __webpack_require__(/*! ./_property-desc */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_property-desc.js\");\nmodule.exports = __webpack_require__(/*! ./_descriptors */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js\") ? function (object, key, value) {\n  return dP.f(object, key, createDesc(1, value));\n} : function (object, key, value) {\n  object[key] = value;\n  return object;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_hide.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_html.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_html.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var document = __webpack_require__(/*! ./_global */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js\").document;\nmodule.exports = document && document.documentElement;\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_html.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_ie8-dom-define.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_ie8-dom-define.js ***!
+  \********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("module.exports = !__webpack_require__(/*! ./_descriptors */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js\") && !__webpack_require__(/*! ./_fails */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_fails.js\")(function () {\n  return Object.defineProperty(__webpack_require__(/*! ./_dom-create */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_dom-create.js\")('div'), 'a', { get: function () { return 7; } }).a != 7;\n});\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_ie8-dom-define.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_iobject.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_iobject.js ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// fallback for non-array-like ES3 and non-enumerable old V8 strings\nvar cof = __webpack_require__(/*! ./_cof */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_cof.js\");\n// eslint-disable-next-line no-prototype-builtins\nmodule.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {\n  return cof(it) == 'String' ? it.split('') : Object(it);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_iobject.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_is-object.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_is-object.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = function (it) {\n  return typeof it === 'object' ? it !== null : typeof it === 'function';\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_is-object.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_library.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_library.js ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = true;\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_library.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-create.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-create.js ***!
+  \*******************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])\nvar anObject = __webpack_require__(/*! ./_an-object */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_an-object.js\");\nvar dPs = __webpack_require__(/*! ./_object-dps */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dps.js\");\nvar enumBugKeys = __webpack_require__(/*! ./_enum-bug-keys */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_enum-bug-keys.js\");\nvar IE_PROTO = __webpack_require__(/*! ./_shared-key */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared-key.js\")('IE_PROTO');\nvar Empty = function () { /* empty */ };\nvar PROTOTYPE = 'prototype';\n\n// Create object with fake `null` prototype: use iframe Object with cleared prototype\nvar createDict = function () {\n  // Thrash, waste and sodomy: IE GC bug\n  var iframe = __webpack_require__(/*! ./_dom-create */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_dom-create.js\")('iframe');\n  var i = enumBugKeys.length;\n  var lt = '<';\n  var gt = '>';\n  var iframeDocument;\n  iframe.style.display = 'none';\n  __webpack_require__(/*! ./_html */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_html.js\").appendChild(iframe);\n  iframe.src = 'javascript:'; // eslint-disable-line no-script-url\n  // createDict = iframe.contentWindow.Object;\n  // html.removeChild(iframe);\n  iframeDocument = iframe.contentWindow.document;\n  iframeDocument.open();\n  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);\n  iframeDocument.close();\n  createDict = iframeDocument.F;\n  while (i--) delete createDict[PROTOTYPE][enumBugKeys[i]];\n  return createDict();\n};\n\nmodule.exports = Object.create || function create(O, Properties) {\n  var result;\n  if (O !== null) {\n    Empty[PROTOTYPE] = anObject(O);\n    result = new Empty();\n    Empty[PROTOTYPE] = null;\n    // add \"__proto__\" for Object.getPrototypeOf polyfill\n    result[IE_PROTO] = O;\n  } else result = createDict();\n  return Properties === undefined ? result : dPs(result, Properties);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-create.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dp.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dp.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var anObject = __webpack_require__(/*! ./_an-object */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_an-object.js\");\nvar IE8_DOM_DEFINE = __webpack_require__(/*! ./_ie8-dom-define */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_ie8-dom-define.js\");\nvar toPrimitive = __webpack_require__(/*! ./_to-primitive */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-primitive.js\");\nvar dP = Object.defineProperty;\n\nexports.f = __webpack_require__(/*! ./_descriptors */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js\") ? Object.defineProperty : function defineProperty(O, P, Attributes) {\n  anObject(O);\n  P = toPrimitive(P, true);\n  anObject(Attributes);\n  if (IE8_DOM_DEFINE) try {\n    return dP(O, P, Attributes);\n  } catch (e) { /* empty */ }\n  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');\n  if ('value' in Attributes) O[P] = Attributes.value;\n  return O;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dp.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dps.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dps.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var dP = __webpack_require__(/*! ./_object-dp */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dp.js\");\nvar anObject = __webpack_require__(/*! ./_an-object */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_an-object.js\");\nvar getKeys = __webpack_require__(/*! ./_object-keys */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys.js\");\n\nmodule.exports = __webpack_require__(/*! ./_descriptors */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_descriptors.js\") ? Object.defineProperties : function defineProperties(O, Properties) {\n  anObject(O);\n  var keys = getKeys(Properties);\n  var length = keys.length;\n  var i = 0;\n  var P;\n  while (length > i) dP.f(O, P = keys[i++], Properties[P]);\n  return O;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-dps.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys-internal.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys-internal.js ***!
+  \**************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var has = __webpack_require__(/*! ./_has */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_has.js\");\nvar toIObject = __webpack_require__(/*! ./_to-iobject */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-iobject.js\");\nvar arrayIndexOf = __webpack_require__(/*! ./_array-includes */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_array-includes.js\")(false);\nvar IE_PROTO = __webpack_require__(/*! ./_shared-key */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared-key.js\")('IE_PROTO');\n\nmodule.exports = function (object, names) {\n  var O = toIObject(object);\n  var i = 0;\n  var result = [];\n  var key;\n  for (key in O) if (key != IE_PROTO) has(O, key) && result.push(key);\n  // Don't enum bug & hidden keys\n  while (names.length > i) if (has(O, key = names[i++])) {\n    ~arrayIndexOf(result, key) || result.push(key);\n  }\n  return result;\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys-internal.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// 19.1.2.14 / 15.2.3.14 Object.keys(O)\nvar $keys = __webpack_require__(/*! ./_object-keys-internal */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys-internal.js\");\nvar enumBugKeys = __webpack_require__(/*! ./_enum-bug-keys */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_enum-bug-keys.js\");\n\nmodule.exports = Object.keys || function keys(O) {\n  return $keys(O, enumBugKeys);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-keys.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_property-desc.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_property-desc.js ***!
+  \*******************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = function (bitmap, value) {\n  return {\n    enumerable: !(bitmap & 1),\n    configurable: !(bitmap & 2),\n    writable: !(bitmap & 4),\n    value: value\n  };\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_property-desc.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared-key.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared-key.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var shared = __webpack_require__(/*! ./_shared */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared.js\")('keys');\nvar uid = __webpack_require__(/*! ./_uid */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_uid.js\");\nmodule.exports = function (key) {\n  return shared[key] || (shared[key] = uid(key));\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared-key.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var core = __webpack_require__(/*! ./_core */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_core.js\");\nvar global = __webpack_require__(/*! ./_global */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_global.js\");\nvar SHARED = '__core-js_shared__';\nvar store = global[SHARED] || (global[SHARED] = {});\n\n(module.exports = function (key, value) {\n  return store[key] || (store[key] = value !== undefined ? value : {});\n})('versions', []).push({\n  version: core.version,\n  mode: __webpack_require__(/*! ./_library */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_library.js\") ? 'pure' : 'global',\n  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'\n});\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_shared.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-absolute-index.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-absolute-index.js ***!
+  \***********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var toInteger = __webpack_require__(/*! ./_to-integer */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-integer.js\");\nvar max = Math.max;\nvar min = Math.min;\nmodule.exports = function (index, length) {\n  index = toInteger(index);\n  return index < 0 ? max(index + length, 0) : min(index, length);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-absolute-index.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-integer.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-integer.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("// 7.1.4 ToInteger\nvar ceil = Math.ceil;\nvar floor = Math.floor;\nmodule.exports = function (it) {\n  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-integer.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-iobject.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-iobject.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// to indexed object, toObject with fallback for non-array-like ES3 strings\nvar IObject = __webpack_require__(/*! ./_iobject */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_iobject.js\");\nvar defined = __webpack_require__(/*! ./_defined */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_defined.js\");\nmodule.exports = function (it) {\n  return IObject(defined(it));\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-iobject.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-length.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-length.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// 7.1.15 ToLength\nvar toInteger = __webpack_require__(/*! ./_to-integer */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-integer.js\");\nvar min = Math.min;\nmodule.exports = function (it) {\n  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-length.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-primitive.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-primitive.js ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("// 7.1.1 ToPrimitive(input [, PreferredType])\nvar isObject = __webpack_require__(/*! ./_is-object */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_is-object.js\");\n// instead of the ES6 spec version, we didn't implement @@toPrimitive case\n// and the second argument - flag - preferred type is a string\nmodule.exports = function (it, S) {\n  if (!isObject(it)) return it;\n  var fn, val;\n  if (S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;\n  if (typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it))) return val;\n  if (!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;\n  throw TypeError(\"Can't convert object to primitive value\");\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_to-primitive.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/_uid.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/_uid.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("var id = 0;\nvar px = Math.random();\nmodule.exports = function (key) {\n  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));\n};\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/_uid.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-runtime/node_modules/core-js/library/modules/es6.object.create.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/babel-runtime/node_modules/core-js/library/modules/es6.object.create.js ***!
+  \**********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var $export = __webpack_require__(/*! ./_export */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_export.js\");\n// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])\n$export($export.S, 'Object', { create: __webpack_require__(/*! ./_object-create */ \"./node_modules/babel-runtime/node_modules/core-js/library/modules/_object-create.js\") });\n\n\n//# sourceURL=webpack:///./node_modules/babel-runtime/node_modules/core-js/library/modules/es6.object.create.js?");
+
+/***/ }),
+
 /***/ "./node_modules/fbjs/lib/ExecutionEnvironment.js":
 /*!*******************************************************!*\
   !*** ./node_modules/fbjs/lib/ExecutionEnvironment.js ***!
@@ -346,7 +885,7 @@ eval("\n\nif (false) {} else {\n  module.exports = __webpack_require__(/*! ./cjs
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar _react = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _reactDom = __webpack_require__(/*! react-dom */ \"./node_modules/react-dom/index.js\");\n\nvar _reactDom2 = _interopRequireDefault(_reactDom);\n\nvar _testPlugin = __webpack_require__(/*! ./test-plugin */ \"./src/test-plugin.js\");\n\nvar _testPlugin2 = _interopRequireDefault(_testPlugin);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n// Create a container for the app.\nvar container = new jQuery('<div />').attr('id', 'approot');\njQuery('body').prepend(container);\njQuery(document).ready(function () {\n\tconsole.log('rendering to... ', document.getElementById('wpadminbar'));\n\tvar container = document.createElement('div');\n\tdocument.getElementById('wpadminbar').appendChild(container);\n\t_reactDom2.default.render(_react2.default.createElement(_testPlugin2.default, null), container);\n});\n\n//# sourceURL=webpack:///./src/index.js?");
+eval("\n\nvar _react = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar _react2 = _interopRequireDefault(_react);\n\nvar _reactDom = __webpack_require__(/*! react-dom */ \"./node_modules/react-dom/index.js\");\n\nvar _reactDom2 = _interopRequireDefault(_reactDom);\n\nvar _testPlugin = __webpack_require__(/*! ./test-plugin */ \"./src/test-plugin.js\");\n\nvar _testPlugin2 = _interopRequireDefault(_testPlugin);\n\nvar _hooks = __webpack_require__(/*! @wordpress/hooks */ \"./node_modules/@wordpress/hooks/build-module/index.js\");\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nwindow.wp = wp || {};\nwp.hooks = wp.hooks || (0, _hooks.createHooks)();\n\nvar appStartup = function appStartup() {\n\tconsole.log('rendering to... ', document.getElementById('wpadminbar'));\n\tvar container = document.createElement('div');\n\tdocument.getElementById('wpadminbar').appendChild(container);\n\t_reactDom2.default.render(_react2.default.createElement(_testPlugin2.default, null), container);\n};\nwp.hooks.addAction('start-app', 'adam/test-plugin', appStartup);\n\n//wp.hooks.removeAction( 'start-app', 'adam/test-plugin' );\n\n// Create a container for the app.\njQuery(document).ready(function () {\n\twp.hooks.doAction('start-app');\n});\n\n/*\nwp.hooks.addFilter(\n\t'button-name',\n\t'adam/test-plugin',\n\tfunction() { return 'This is the new NAME'; }\n);\n\nwp.hooks.removeFilter( 'button-name', 'adam/test-plugin' );\n*/\n\n//# sourceURL=webpack:///./src/index.js?");
 
 /***/ }),
 
@@ -358,7 +897,7 @@ eval("\n\nvar _react = __webpack_require__(/*! react */ \"./node_modules/react/i
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n\tvalue: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _react = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar _react2 = _interopRequireDefault(_react);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar TestPlugin = function (_React$Component) {\n\t_inherits(TestPlugin, _React$Component);\n\n\tfunction TestPlugin() {\n\t\t_classCallCheck(this, TestPlugin);\n\n\t\treturn _possibleConstructorReturn(this, (TestPlugin.__proto__ || Object.getPrototypeOf(TestPlugin)).apply(this, arguments));\n\t}\n\n\t_createClass(TestPlugin, [{\n\t\tkey: 'componentDidMount',\n\t\tvalue: function componentDidMount() {\n\t\t\t//this.filterBlockListBlock();\n\t\t}\n\t}, {\n\t\tkey: 'filterExtraProps',\n\t\tvalue: function filterExtraProps() {\n\t\t\tconsole.log('filterExtraProps');\n\t\t\tvar addBackgroundColorStyle = function addBackgroundColorStyle(props) {\n\t\t\t\treturn Object.assign(props, { style: { backgroundColor: 'red' } });\n\t\t\t};\n\n\t\t\twp.hooks.addFilter('blocks.getSaveContent.extraProps', 'my-plugin/add-background-color-style', addBackgroundColorStyle);\n\t\t}\n\t}, {\n\t\tkey: 'filterClassName',\n\t\tvalue: function filterClassName() {\n\t\t\tconsole.log('filterClassName');\n\t\t\t// Our filter function\n\t\t\tvar setBlockCustomClassName = function setBlockCustomClassName(className, blockName) {\n\t\t\t\treturn blockName === 'core/code' ? 'my-plugin-code' : className;\n\t\t\t};\n\n\t\t\t// Adding the filter\n\t\t\twp.hooks.addFilter('blocks.getBlockDefaultClassName', 'my-plugin/set-block-custom-class-name', setBlockCustomClassName);\n\t\t}\n\t}, {\n\t\tkey: 'filterBlockEdit',\n\t\tvalue: function filterBlockEdit() {\n\t\t\tconsole.log('filterBlockEdit');\n\t\t\tvar el = wp.element.createElement;\n\n\t\t\tvar withInspectorControls = wp.element.createHigherOrderComponent(function (BlockEdit) {\n\t\t\t\treturn function (props) {\n\t\t\t\t\treturn el(wp.element.Fragment, {}, el(BlockEdit, props), el(wp.editor.InspectorControls, {}, el(wp.components.PanelBody, {}, 'My custom control')));\n\t\t\t\t};\n\t\t\t}, 'withInspectorControls');\n\n\t\t\twp.hooks.addFilter('editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls);\n\t\t}\n\n\t\t// Filter blocks, adding a data-alignment point.\n\n\t}, {\n\t\tkey: 'filterBlockListBlock',\n\t\tvalue: function filterBlockListBlock() {\n\t\t\tconsole.log('filterBlockListBlock');\n\t\t\tvar el = wp.element.createElement;\n\n\t\t\tvar withDataAlign = wp.element.createHigherOrderComponent(function (BlockListBlock) {\n\t\t\t\treturn function (props) {\n\t\t\t\t\tvar newProps = Object.assign({}, props, {\n\t\t\t\t\t\twrapperProps: Object.assign({}, props.wrapperProps, {\n\t\t\t\t\t\t\t'data-alignment': props.block.attributes.align\n\t\t\t\t\t\t})\n\t\t\t\t\t});\n\n\t\t\t\t\treturn el(BlockListBlock, newProps);\n\t\t\t\t};\n\t\t\t}, 'withAlign');\n\n\t\t\twp.hooks.addFilter('editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign);\n\t\t}\n\t}, {\n\t\tkey: 'render',\n\t\tvalue: function render() {\n\t\t\treturn _react2.default.createElement(\n\t\t\t\t'div',\n\t\t\t\t{ className: 'test-plugin-wrapper' },\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterExtraProps\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Extra Props'\n\t\t\t\t),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterClassName\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Class Name'\n\t\t\t\t),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterBlockEdit\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Block Edit'\n\t\t\t\t),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterBlockListBlock\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Block List Block'\n\t\t\t\t)\n\t\t\t);\n\t\t}\n\t}]);\n\n\treturn TestPlugin;\n}(_react2.default.Component);\n\nexports.default = TestPlugin;\n\n//# sourceURL=webpack:///./src/test-plugin.js?");
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n\tvalue: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _react = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n\nvar _react2 = _interopRequireDefault(_react);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar TestPlugin = function (_React$Component) {\n\t_inherits(TestPlugin, _React$Component);\n\n\tfunction TestPlugin() {\n\t\t_classCallCheck(this, TestPlugin);\n\n\t\treturn _possibleConstructorReturn(this, (TestPlugin.__proto__ || Object.getPrototypeOf(TestPlugin)).apply(this, arguments));\n\t}\n\n\t_createClass(TestPlugin, [{\n\t\tkey: 'componentDidMount',\n\t\tvalue: function componentDidMount() {\n\t\t\tvar _this2 = this;\n\n\t\t\t//this.filterBlockListBlock();\n\t\t\twp.hooks.addAction('hookAdded', 'adam/test-plugin', function () {\n\t\t\t\t_this2.forceUpdate();\n\t\t\t});\n\t\t}\n\t}, {\n\t\tkey: 'filterExtraProps',\n\t\tvalue: function filterExtraProps() {\n\t\t\tconsole.log('filterExtraProps');\n\t\t\tvar addBackgroundColorStyle = function addBackgroundColorStyle(props) {\n\t\t\t\treturn Object.assign(props, { style: { backgroundColor: 'red' } });\n\t\t\t};\n\n\t\t\twp.hooks.addFilter('blocks.getSaveContent.extraProps', 'my-plugin/add-background-color-style', addBackgroundColorStyle);\n\t\t}\n\t}, {\n\t\tkey: 'filterClassName',\n\t\tvalue: function filterClassName() {\n\t\t\tconsole.log('filterClassName');\n\t\t\t// Our filter function\n\t\t\tvar setBlockCustomClassName = function setBlockCustomClassName(className, blockName) {\n\t\t\t\treturn blockName === 'core/code' ? 'my-plugin-code' : className;\n\t\t\t};\n\n\t\t\t// Adding the filter\n\t\t\twp.hooks.addFilter('blocks.getBlockDefaultClassName', 'my-plugin/set-block-custom-class-name', setBlockCustomClassName);\n\t\t}\n\t}, {\n\t\tkey: 'filterBlockEdit',\n\t\tvalue: function filterBlockEdit() {\n\t\t\tconsole.log('filterBlockEdit');\n\t\t\tvar el = wp.element.createElement;\n\n\t\t\tvar withInspectorControls = wp.element.createHigherOrderComponent(function (BlockEdit) {\n\t\t\t\treturn function (props) {\n\t\t\t\t\treturn el(wp.element.Fragment, {}, el(BlockEdit, props), el(wp.editor.InspectorControls, {}, el(wp.components.PanelBody, {}, 'My custom control')));\n\t\t\t\t};\n\t\t\t}, 'withInspectorControls');\n\n\t\t\twp.hooks.addFilter('editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls);\n\t\t}\n\n\t\t// Filter blocks, adding a data-alignment point.\n\n\t}, {\n\t\tkey: 'filterBlockListBlock',\n\t\tvalue: function filterBlockListBlock() {\n\t\t\tconsole.log('filterBlockListBlock');\n\t\t\tvar el = wp.element.createElement;\n\n\t\t\tvar withDataAlign = wp.element.createHigherOrderComponent(function (BlockListBlock) {\n\t\t\t\treturn function (props) {\n\t\t\t\t\tvar newProps = Object.assign({}, props, {\n\t\t\t\t\t\twrapperProps: Object.assign({}, props.wrapperProps, {\n\t\t\t\t\t\t\t'data-alignment': props.block.attributes.align\n\t\t\t\t\t\t})\n\t\t\t\t\t});\n\n\t\t\t\t\treturn el(BlockListBlock, newProps);\n\t\t\t\t};\n\t\t\t}, 'withAlign');\n\n\t\t\twp.hooks.addFilter('editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign);\n\t\t}\n\t}, {\n\t\tkey: 'render',\n\t\tvalue: function render() {\n\t\t\treturn _react2.default.createElement(\n\t\t\t\t'div',\n\t\t\t\t{ className: 'test-plugin-wrapper' },\n\t\t\t\twp.hooks.applyFilters('button-name', 'Test buttons'),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterExtraProps\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Extra Props'\n\t\t\t\t),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterClassName\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Class Name'\n\t\t\t\t),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterBlockEdit\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Block Edit'\n\t\t\t\t),\n\t\t\t\t_react2.default.createElement(\n\t\t\t\t\t'button',\n\t\t\t\t\t{ className: 'button',\n\t\t\t\t\t\tonClick: this.filterBlockListBlock\n\t\t\t\t\t},\n\t\t\t\t\t'Filter Block List Block'\n\t\t\t\t)\n\t\t\t);\n\t\t}\n\t}]);\n\n\treturn TestPlugin;\n}(_react2.default.Component);\n\nexports.default = TestPlugin;\n\n//# sourceURL=webpack:///./src/test-plugin.js?");
 
 /***/ })
 
