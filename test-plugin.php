@@ -8,7 +8,7 @@
  * License:           GPLv2 or later
  * Text Domain:       Test Plugin
  * Domain Path:       /lang/
- * GitHub Plugin URI: https://github.com/adamsilverstein/header-toy
+ * GitHub Plugin URI: https://github.com/adamsilverstein/test-plugin
  */
 
  namespace TestPlugin;
@@ -30,5 +30,6 @@ add_action(
 );
 
 function enqueue_scripts() {
-	wp_enqueue_script( 'header-toy', plugins_url( 'dist/main.js', __FILE__ ), array( 'jquery' ), HT_VERSION, true );
+	wp_enqueue_script( 'test-plugin', plugins_url( 'dist/main.js', __FILE__ ), array( 'jquery' ), HT_VERSION, true );
+	wp_enqueue_style( 'test-plugin', plugins_url( 'styles.css', __FILE__ ) );
 }

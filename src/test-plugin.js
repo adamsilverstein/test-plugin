@@ -1,15 +1,27 @@
 import React from 'react';
 
-import './header.css';
-
 class TestPlugin extends React.Component {
+
 	componentDidMount() {
+		//this.filterBlockListBlock();
+	}
+	filterExtraProps() {
+		console.log( 'filterExtraProps' );
+		const addBackgroundColorStyle = ( props ) => {
+			return Object.assign( props, { style: { backgroundColor: 'red' } } );
+		}
+
+		wp.hooks.addFilter(
+			'blocks.getSaveContent.extraProps',
+			'my-plugin/add-background-color-style',
+			addBackgroundColorStyle
+		);
 	}
 
 	filterClassName() {
 		console.log( 'filterClassName' );
 		// Our filter function
-		function setBlockCustomClassName( className, blockName ) {
+		const setBlockCustomClassName = ( className, blockName ) => {
 			return blockName === 'core/code' ?
 				'my-plugin-code' :
 				className;
@@ -20,20 +32,6 @@ class TestPlugin extends React.Component {
 			'blocks.getBlockDefaultClassName',
 			'my-plugin/set-block-custom-class-name',
 			setBlockCustomClassName
-		);
-	}
-
-	filterExtraProps() {
-		console.log( 'filterExtraProps' );
-		console.log( addBackground );
-		function addBackgroundColorStyle( props ) {
-			return Object.assign( props, { style: { backgroundColor: 'red' } } );
-		}
-
-		wp.hooks.addFilter(
-			'blocks.getSaveContent.extraProps',
-			'my-plugin/add-background-color-style',
-			addBackgroundColorStyle
 		);
 	}
 
@@ -66,6 +64,7 @@ class TestPlugin extends React.Component {
 		wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
 	}
 
+	// Filter blocks, adding a data-alignment point.
 	filterBlockListBlock() {
 		console.log( 'filterBlockListBlock' );
 		var el = wp.element.createElement;
@@ -80,7 +79,7 @@ class TestPlugin extends React.Component {
 							{},
 							props.wrapperProps,
 							{
-								'data-align': props.block.attributes.align
+								'data-alignment': props.block.attributes.align
 							}
 						)
 					}
@@ -99,23 +98,23 @@ class TestPlugin extends React.Component {
 	}
 	render() {
 		return (
-			<div>
-				<button className='button button-large'
+			<div className='test-plugin-wrapper'>
+				<button className='button'
 					onClick={ this.filterExtraProps }
 				>
 					Filter Extra Props
 				</button>
-				<button className='button button-large'
+				<button className='button'
 					onClick={ this.filterClassName }
 				>
 					Filter Class Name
 				</button>
-				<button className='button button-large'
+				<button className='button'
 					onClick={ this.filterBlockEdit }
 				>
 					Filter Block Edit
 				</button>
-				<button className='button button-large'
+				<button className='button'
 					onClick={ this.filterBlockListBlock }
 				>
 					Filter Block List Block

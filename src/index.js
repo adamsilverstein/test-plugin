@@ -7,8 +7,11 @@ import TestPlugin from './test-plugin';
 const container = new jQuery( '<div />' ).attr( 'id', 'approot' );
 jQuery( 'body' ).prepend( container );
 jQuery( document ).ready( function() {
+	console.log( 'rendering to... ', document.getElementById('wpadminbar') );
+	var container = document.createElement( 'div' );
+	document.getElementById('wpadminbar').appendChild( container );
 	ReactDOM.render(
-	<TestPlugin />,
-	document.getElementById('approot')
+		<TestPlugin />,
+		container
 	);
 } );
