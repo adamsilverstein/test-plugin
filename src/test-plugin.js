@@ -4,6 +4,9 @@ class TestPlugin extends React.Component {
 
 	componentDidMount() {
 		//this.filterBlockListBlock();
+		wp.hooks.addAction( 'hookAdded', 'adam/test-plugin', () => {
+			this.forceUpdate();
+		} )
 	}
 	filterExtraProps() {
 		console.log( 'filterExtraProps' );
@@ -99,6 +102,7 @@ class TestPlugin extends React.Component {
 	render() {
 		return (
 			<div className='test-plugin-wrapper'>
+				{ wp.hooks.applyFilters('button-name', 'Test buttons')}
 				<button className='button'
 					onClick={ this.filterExtraProps }
 				>
