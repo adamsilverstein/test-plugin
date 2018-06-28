@@ -1,0 +1,21 @@
+#wpadminbar .test-plugin-wrapper {
+	margin: 1px;
+}
+
+#wpadminbar .test-plugin-wrapper button {
+	margin: 2px;
+	padding: 2px;
+	line-height: 20px;
+}
+
+.editor-block-list__block[data-alignment="left"] {
+	background-color: red;
+}
+
+.editor-block-list__block[data-alignment="center"] {
+	background-color: green;
+}
+
+.editor-block-list__block[data-alignment="right"] {
+	background-color: blue;
+}
