@@ -69,11 +69,10 @@ class TestPlugin extends React.Component {
 
 	// Filter blocks, adding a data-alignment point.
 	filterBlockListBlock() {
-		console.log( 'filterBlockListBlock' );
 		var el = wp.element.createElement;
 
 		var withDataAlign = wp.element.createHigherOrderComponent( function( BlockListBlock ) {
-			return function( props ) {
+			return function() {
 				var newProps = Object.assign(
 					{},
 					props,
